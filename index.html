@@ -99,10 +99,11 @@ function render(){ $('keyPill').textContent='Key: '+$('keySelect').value;$('posi
 $('rotationList').innerHTML=positions.map((p,i)=>`<div class="item"><strong>${i==Number($('positionSelect').value)?'Today':'Day '+(i+1)}</strong><span>${p.name} — ${p.major}/${p.minor}</span></div>`).join('');
 $('flowList').innerHTML=(mode==='train'
 ?trainBlocks.map((b,i)=>`<div class="item" data-flow-index="${i}"><strong>${b[0]}</strong><span>${Math.round(b[1]/60)} min</span></div>`)
-:[['Progression','Randomly assigned'],['Mode','Major or minor'],['Current chord','Highlighted live'],['Constraint','Changes with chord']].map(x=>`<div class="item"><strong>${x[0]}</strong><span>${x[1]}</span></div>`)).join('');
+:[['Progression','Randomly assigned'],['Mode','Major or minor'],['Chord change','Every fifth bar'],['Constraint','Changes with chord']].map(x=>`<div class="item"><strong>${x[0]}</strong><span>${x[1]}</span></div>`)).join('');
 $('progressList').innerHTML=`<div class="item"><strong>Sessions</strong><span>${localStorage.getItem('cagedSessions')??0}</span></div><div class="item"><strong>Last session</strong><span>${localStorage.getItem('cagedLastSession')??'Not yet'}</span></div><div class="item"><strong>Next suggestion</strong><span>${positions[(Number(localStorage.getItem('cagedLastPosition')??-1)+1)%5].name}</span></div>`}
 let promptVisualToggle=false;
 let beatCount=0;
+let performBarCount=0;
 
 function animatePromptCard(){
   const card=$('promptCard');
@@ -296,6 +297,7 @@ function startSession(){
     $('progressFill').style.width='0%';
     activePerformProgression=rand(performProgressions);
     activePerformChordIndex=0;
+    performBarCount=0;
     activePerformConstraint=rand(constraints);
     performPrompt(false);
     timerId=setInterval(()=>{
@@ -310,7 +312,6 @@ function startSession(){
       }
       $('timer').textContent=fmt(remaining);
       $('progressFill').style.width=(100-(remaining/total)*100)+'%';
-      if(remaining>0&&remaining%16===0) nextPrompt();
     },1000);
     return;
   }
@@ -429,6 +430,15 @@ function startMetro(){
   const tick=()=>{
     const accent=(beatCount%4===0);
     clickSound(accent);
+
+    if(accent && mode==='perform' && timerId){
+      performBarCount++;
+      if(performBarCount===5){
+        performBarCount=0;
+        nextPrompt();
+      }
+    }
+
     beatCount++;
   };
   tick();

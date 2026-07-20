@@ -19,7 +19,14 @@ label{font-size:13px;font-weight:800;color:var(--navy)}select,input{border:1.5px
 .prompt-card{border:1.5px solid var(--line);border-radius:14px;padding:22px;transition:background .25s ease,border-color .25s ease,transform .2s ease}
 .prompt-card.blue{background:#eaf3ff;border-color:#7aa7e8}
 .prompt-card.gray{background:#f2f4f7;border-color:#98a2b3}
-.prompt-card.bump{transform:scale(1.01)}.big{font-size:42px;font-weight:900;color:var(--navy);line-height:1}.medium{font-size:24px;font-weight:900}.constraint{border:1.5px solid var(--navy2);border-radius:12px;padding:16px;background:#f8fbff;color:var(--navy);font-size:24px;font-weight:900}
+.prompt-card.bump{transform:scale(1.01)}
+.progression-display{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:6px}
+.progression-chord{display:inline-flex;align-items:center;justify-content:center;min-width:58px;padding:9px 12px;border:2px solid #d0d5dd;border-radius:10px;background:white;color:var(--navy);font-size:21px;font-weight:900;transition:all .18s ease}
+.progression-chord.active{border:3px solid var(--navy);background:#dbeafe;box-shadow:0 0 0 3px rgba(46,144,250,.15);transform:scale(1.07)}
+.progression-arrow{color:#667085;font-weight:900;font-size:20px}
+.perform-mode-badge{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:#eef4ff;color:var(--navy);font-size:13px;font-weight:800;margin-bottom:8px}
+.volume-row{display:grid;grid-template-columns:130px 1fr 48px;align-items:center;gap:10px}
+.volume-row input[type="range"]{width:100%}.big{font-size:42px;font-weight:900;color:var(--navy);line-height:1}.medium{font-size:24px;font-weight:900}.constraint{border:1.5px solid var(--navy2);border-radius:12px;padding:16px;background:#f8fbff;color:var(--navy);font-size:24px;font-weight:900}
 .meta{display:flex;gap:10px;flex-wrap:wrap}.pill{border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:13px;font-weight:800;color:var(--navy);background:white}
 .actions{display:flex;gap:10px;flex-wrap:wrap;padding:0 26px 26px}button.primary,button.secondary,button.danger{border-radius:10px;padding:13px 18px;font-size:15px;font-weight:900;cursor:pointer}button.primary{border:0;background:var(--navy);color:white}button.secondary{background:#eef3fb;color:var(--navy);border:1px solid var(--line)}button.danger{background:#fff2f0;color:var(--danger);border:1px solid #fecdca}
 .side{display:grid;gap:18px}.side h3{margin:0 0 10px;color:var(--navy);font-size:18px}.list{display:grid;gap:8px}.item{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:white;display:flex;justify-content:space-between;gap:12px;font-size:14px}
@@ -33,19 +40,53 @@ label{font-size:13px;font-weight:800;color:var(--navy)}select,input{border:1.5px
 <body>
 <main class="page"><header><div><h1>CAGED Trainer v0.1</h1><div class="subtitle">Train automatically → Perform with constraints</div></div><div class="card panel" style="max-width:380px;color:var(--navy);font-size:14px;line-height:1.4"><strong>Prototype goal:</strong><br>Use this in real time, then refine timing, prompts, constraints, and session flow.</div></header>
 <section class="card panel">
-<div class="controls"><div class="control"><label>Key</label><select id="keySelect"></select></div><div class="control"><label>Position</label><select id="positionSelect"></select></div><div class="control"><label>BPM</label><input id="bpmInput" type="number" min="40" max="220" value="80"></div><div class="control"><label>Train minutes</label><input id="trainMinutes" type="number" min="3" max="20" value="10"></div><div class="control"><label>Perform minutes</label><input id="performMinutes" type="number" min="1" max="15" value="5"></div></div>
+<div class="controls"><div class="control"><label>Key</label><select id="keySelect"></select></div><div class="control"><label>Position</label><select id="positionSelect"></select></div><div class="control"><label>BPM</label><input id="bpmInput" type="number" min="40" max="220" value="80"></div><div class="control"><label>Train minutes</label>
+<div id="performAudioControls" style="display:none;margin-top:14px;gap:12px">
+  <div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" id="backingToggle" checked>
+    <label class="form-check-label" for="backingToggle">Backing chords</label>
+  </div>
+  <div class="volume-row">
+    <label for="metroVolume">Metronome</label>
+    <input type="range" id="metroVolume" min="0" max="100" value="75">
+    <span id="metroVolumeValue">75%</span>
+  </div>
+  <div class="volume-row">
+    <label for="backingVolume">Backing</label>
+    <input type="range" id="backingVolume" min="0" max="100" value="35">
+    <span id="backingVolumeValue">35%</span>
+  </div>
+</div><input id="trainMinutes" type="number" min="3" max="20" value="10"></div><div class="control"><label>Perform minutes</label><input id="performMinutes" type="number" min="1" max="15" value="5"></div></div>
 <div class="mode-tabs"><button id="trainTab" class="active">Train Mode</button><button id="performTab">Perform Mode</button></div>
 <div class="main-grid"><section class="card stage-card"><div class="stage-head"><h2 id="stageTitle">Train Mode</h2><div class="timer" id="timer">10:00</div></div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div class="prompt"><div class="meta"><span class="pill" id="keyPill">Key: A</span><span class="pill" id="positionPill">1st position</span><span class="pill"><span class="metronome-dot" id="metroDot"></span><span id="bpmPill">80 BPM</span></span></div><div class="prompt-card gray" id="promptCard"><div class="big" id="mainPrompt">Ready?</div><div class="medium" id="subPrompt">Press Start Train to begin the daily routine.</div><div class="constraint" id="constraintBox" style="display:none"></div></div></div><div class="actions"><button class="primary" id="startBtn">Start Train</button><button class="secondary" id="metroBtn">Start Metronome</button><button class="danger" id="stopBtn">Stop</button><button class="secondary" id="completeBtn">Mark Session Complete</button></div></section>
-<aside class="side"><section class="card panel"><h3>Today’s Rotation</h3><div class="list" id="rotationList"></div></section><section class="card panel"><h3>Session Flow</h3><div class="list" id="flowList"></div></section><section class="card panel"><h3>Progress</h3><div class="list" id="progressList"></div></section></aside></div>
+<aside class="side"><section class="card panel"><h3>Session Flow</h3><div class="list" id="flowList"></div></section><section class="card panel"><h3>Today’s Rotation</h3><div class="list" id="rotationList"></div></section><section class="card panel"><h3>Progress</h3><div class="list" id="progressList"></div></section></aside></div>
 <div class="footer-note">Train mode now runs automatically: the metronome starts with the session, prompts advance on their own, and a bell marks each new section.</div>
 </section></main>
 <script>
 const keys=['A','Bb','B','C','C#','D','D#','E','F','F#','G','G#'], chromatic=keys, majorSteps=[0,2,4,5,7,9,11];
 const positions=[{name:'1st position',major:'E shape',minor:'Dm shape'},{name:'2nd position',major:'D shape',minor:'Cm shape'},{name:'3rd position',major:'C shape',minor:'Am shape'},{name:'4th position',major:'A shape',minor:'Gm shape'},{name:'5th position',major:'G shape',minor:'Em shape'}];
 const degreeShapes={'1st position':[['1','E'],['2','Gm (A)'],['3','Am (C)'],['4','A'],['5','C'],['6','Dm (E)']],'2nd position':[['1','D'],['2','Em (G)'],['3','Gm (A)'],['4','G'],['5','A'],['6','Cm (D)']],'3rd position':[['1','C'],['2','Dm (E)'],['3','Em (G)'],['4','E'],['5','G'],['6','Am (C)']],'4th position':[['1','A'],['2','Cm (D)'],['3','Dm (E)'],['4','D'],['5','E'],['6','Gm (A)']],'5th position':[['1','G'],['2','Am (C)'],['3','Cm (D)'],['4','C'],['5','D'],['6','Em (G)']]};
-const trainBlocks=[['Note Recall',120],['Chord Shape',90],['Arpeggio',120],['Full Scale',180],['Pentatonic',90]];
+const trainBlocks=[['Note Recall',60],['Chord Shape',90],['Arpeggio',120],['Full Scale',180],['Pentatonic',90]];
 const constraints=['Chord tones only','Arpeggio only','Full scale only','Pentatonic only','Avoid the root','Start every phrase on the 3rd','Resolve every phrase to the 5th','Use only strings 1–3','Use only strings 4–6','Free solo'];
-const progressions=[['1','6','4','5'],['1','5','6','4'],['2','5','1','6'],['1','4','2','5'],['6','4','1','5']];
+const performProgressions=[
+  {name:'Pop Rock',mode:'major',degrees:['1','5','6','4']},
+  {name:'Classic Rock',mode:'major',degrees:['1','4','5']},
+  {name:'50s Rock',mode:'major',degrees:['1','6','4','5']},
+  {name:'Folk Rock',mode:'major',degrees:['1','5','4']},
+  {name:'Rock Anthem',mode:'major',degrees:['6','4','1','5']},
+  {name:'Alternative Minor',mode:'minor',degrees:['1','6','3','7']},
+  {name:'Dark Rock',mode:'minor',degrees:['1','7','6','7']},
+  {name:'Minor Rock',mode:'minor',degrees:['1','4','7']},
+  {name:'Cinematic Minor',mode:'minor',degrees:['1','6','7']},
+  {name:'Modal Rock',mode:'minor',degrees:['1','3','7','6']}
+];
+let activePerformProgression=null;
+let activePerformChordIndex=0;
+let activePerformConstraint='';
+let backingVoices=[];
+let backingEnabled=true;
+let metronomeVolume=.75;
+let backingVolume=.35;
 let mode='train',timerId=null,metroId=null,remaining=600,total=600,promptIndex=0,metroOn=false,audioCtx=null;
 const $=id=>document.getElementById(id);
 keys.forEach(k=>$('keySelect').add(new Option(k,k)));positions.forEach((p,i)=>$('positionSelect').add(new Option(`${p.name} — ${p.major} / ${p.minor}`,i)));
@@ -58,7 +99,7 @@ function render(){ $('keyPill').textContent='Key: '+$('keySelect').value;$('posi
 $('rotationList').innerHTML=positions.map((p,i)=>`<div class="item"><strong>${i==Number($('positionSelect').value)?'Today':'Day '+(i+1)}</strong><span>${p.name} — ${p.major}/${p.minor}</span></div>`).join('');
 $('flowList').innerHTML=(mode==='train'
 ?trainBlocks.map((b,i)=>`<div class="item" data-flow-index="${i}"><strong>${b[0]}</strong><span>${Math.round(b[1]/60)} min</span></div>`)
-:[['Backing prompt','Chord progression'],['Constraint','Forced option'],['Change','Every 16 seconds'],['Goal','Avoid comfort-zone choosing']].map(x=>`<div class="item"><strong>${x[0]}</strong><span>${x[1]}</span></div>`)).join('');
+:[['Progression','Randomly assigned'],['Mode','Major or minor'],['Current chord','Highlighted live'],['Constraint','Changes with chord']].map(x=>`<div class="item"><strong>${x[0]}</strong><span>${x[1]}</span></div>`)).join('');
 $('progressList').innerHTML=`<div class="item"><strong>Sessions</strong><span>${localStorage.getItem('cagedSessions')??0}</span></div><div class="item"><strong>Last session</strong><span>${localStorage.getItem('cagedLastSession')??'Not yet'}</span></div><div class="item"><strong>Next suggestion</strong><span>${positions[(Number(localStorage.getItem('cagedLastPosition')??-1)+1)%5].name}</span></div>`}
 let promptVisualToggle=false;
 let beatCount=0;
@@ -125,9 +166,118 @@ function trainPrompt(sectionIndex, itemIndex, soundPrompt=true){
     $('subPrompt').textContent='Play the '+ch+' '+([2,3,6].includes(Number(degree))?'minor':'major')+' pentatonic using the '+shape+' shape.';
   }
 }
-function performPrompt(){animatePromptCard();dingSound();$('constraintBox').style.display='block';const key=$('keySelect').value, prog=progressions[promptIndex%progressions.length], degree=prog[promptIndex%prog.length];$('mainPrompt').textContent=chord(key,degree);$('subPrompt').textContent='Progression: '+prog.map(d=>chord(key,d)).join(' → ');$('constraintBox').textContent='Constraint: '+rand(constraints)}
-function nextPrompt(){promptIndex++;performPrompt()}
-function stopTimer(){if(timerId)clearInterval(timerId);timerId=null}
+const NOTE_INDEX={'C':0,'C#':1,'D':2,'D#':3,'E':4,'F':5,'F#':6,'G':7,'G#':8,'A':9,'A#':10,'B':11,'Bb':10};
+
+function midiToFreq(midi){
+  return 440*Math.pow(2,(midi-69)/12);
+}
+
+function rootMidi(note,octave=3){
+  return 12*(octave+1)+NOTE_INDEX[note];
+}
+
+function modeScale(mode){
+  return mode==='major'?[0,2,4,5,7,9,11]:[0,2,3,5,7,8,10];
+}
+
+function chordNotesForDegree(key,mode,degree){
+  const scale=modeScale(mode);
+  const d=Number(degree)-1;
+  const base=rootMidi(key,3);
+  const root=base+scale[d];
+  const third=base+scale[(d+2)%7]+((d+2)>=7?12:0);
+  const fifth=base+scale[(d+4)%7]+((d+4)>=7?12:0);
+  return [root,third,fifth,root+12];
+}
+
+function stopBackingChord(release=.35){
+  if(!audioCtx) return;
+  const now=audioCtx.currentTime;
+  backingVoices.forEach(({osc,gain})=>{
+    try{
+      gain.gain.cancelScheduledValues(now);
+      gain.gain.setValueAtTime(Math.max(gain.gain.value,.0001),now);
+      gain.gain.exponentialRampToValueAtTime(.0001,now+release);
+      osc.stop(now+release+.03);
+    }catch(e){}
+  });
+  backingVoices=[];
+}
+
+function playBackingChord(){
+  stopBackingChord(.25);
+  if(!backingEnabled || !activePerformProgression || backingVolume<=0) return;
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+
+  const key=$('keySelect').value;
+  const degree=activePerformProgression.degrees[activePerformChordIndex];
+  const notes=chordNotesForDegree(key,activePerformProgression.mode,degree);
+  const now=audioCtx.currentTime;
+
+  notes.forEach((midi,index)=>{
+    const osc=audioCtx.createOscillator();
+    const filter=audioCtx.createBiquadFilter();
+    const gain=audioCtx.createGain();
+
+    osc.type=index===0?'sine':'triangle';
+    osc.frequency.value=midiToFreq(midi);
+    filter.type='lowpass';
+    filter.frequency.value=1500;
+    gain.gain.setValueAtTime(.0001,now);
+    gain.gain.exponentialRampToValueAtTime(Math.max(.0001,backingVolume*(index===0?.16:.11)),now+.12);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    backingVoices.push({osc,gain});
+  });
+}
+
+function chordNameForMode(key,mode,degree){
+  const majorQualities=['','m','m','','','m','°'];
+  const minorQualities=['m','°','','m','m','',''];
+  const scale=modeScale(mode);
+  const noteNames=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const root=(NOTE_INDEX[key]+scale[Number(degree)-1])%12;
+  return noteNames[root]+(mode==='major'?majorQualities[Number(degree)-1]:minorQualities[Number(degree)-1]);
+}
+
+function renderPerformProgression(){
+  const key=$('keySelect').value;
+  const prog=activePerformProgression;
+  $('subPrompt').innerHTML=
+    '<div class="perform-mode-badge">'+prog.name+' · '+prog.mode.charAt(0).toUpperCase()+prog.mode.slice(1)+'</div>'+
+    '<div style="font-size:16px;font-weight:800;color:#475467;margin-bottom:8px">Chord progression</div>'+
+    '<div class="progression-display">'+
+    prog.degrees.map((degree,index)=>{
+      const current=index===activePerformChordIndex;
+      const arrow=index<prog.degrees.length-1?'<span class="progression-arrow">→</span>':'';
+      return '<span class="progression-chord '+(current?'active':'')+'">'+chordNameForMode(key,prog.mode,degree)+'</span>'+arrow;
+    }).join('')+
+    '</div>';
+}
+
+function performPrompt(soundPrompt=true){
+  if(soundPrompt){
+    animatePromptCard();
+    dingSound();
+  }
+  $('constraintBox').style.display='block';
+  const key=$('keySelect').value;
+  const degree=activePerformProgression.degrees[activePerformChordIndex];
+  $('mainPrompt').textContent=chordNameForMode(key,activePerformProgression.mode,degree);
+  renderPerformProgression();
+  $('constraintBox').textContent='Constraint: '+activePerformConstraint;
+  playBackingChord();
+}
+
+function nextPrompt(){
+  activePerformChordIndex=(activePerformChordIndex+1)%activePerformProgression.degrees.length;
+  activePerformConstraint=rand(constraints);
+  performPrompt(true);
+}
+
 function startSession(){
   stopTimer();
   if(!metroOn) startMetro();
@@ -138,7 +288,10 @@ function startSession(){
     remaining=total;
     $('timer').textContent=fmt(remaining);
     $('progressFill').style.width='0%';
-    performPrompt();
+    activePerformProgression=rand(performProgressions);
+    activePerformChordIndex=0;
+    activePerformConstraint=rand(constraints);
+    performPrompt(false);
     timerId=setInterval(()=>{
       remaining--;
       if(remaining<0){
@@ -217,7 +370,7 @@ function clickSound(accent=false){
     osc.type='sine';
     osc.frequency.value=1050;
     gain.gain.setValueAtTime(.0001,now);
-    gain.gain.exponentialRampToValueAtTime(.13,now+.005);
+    gain.gain.exponentialRampToValueAtTime(.13*metronomeVolume,now+.005);
     gain.gain.exponentialRampToValueAtTime(.0001,now+.085);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
@@ -234,7 +387,7 @@ function clickSound(accent=false){
     const gain=audioCtx.createGain();
     filter.type='highpass';
     filter.frequency.value=1500;
-    gain.gain.setValueAtTime(.09,now);
+    gain.gain.setValueAtTime(.09*metronomeVolume,now);
     gain.gain.exponentialRampToValueAtTime(.0001,now+.035);
     src.buffer=buffer;
     src.connect(filter);
@@ -275,8 +428,22 @@ function startMetro(){
   tick();
   metroId=setInterval(tick,60000/Number($('bpmInput').value));
 }
-$('trainTab').onclick=()=>{mode='train';$('trainTab').classList.add('active');$('performTab').classList.remove('active');$('stageTitle').textContent='Train Mode';$('startBtn').textContent='Start Train';remaining=Number($('trainMinutes').value)*60;$('timer').textContent=fmt(remaining);$('mainPrompt').textContent='Ready?';$('subPrompt').textContent='Press Start Train to begin the daily routine.';$('constraintBox').style.display='none';document.querySelectorAll('#flowList .item').forEach(i=>i.classList.remove('active-flow'));render()}
-$('performTab').onclick=()=>{mode='perform';$('performTab').classList.add('active');$('trainTab').classList.remove('active');$('stageTitle').textContent='Perform Mode';$('startBtn').textContent='Start Perform';remaining=Number($('performMinutes').value)*60;$('timer').textContent=fmt(remaining);$('mainPrompt').textContent='Ready to jam?';$('subPrompt').textContent='Press Start Perform for chord prompts and forced constraints.';$('constraintBox').style.display='block';$('constraintBox').textContent='Constraint: no comfort-zone choosing';document.querySelectorAll('#flowList .item').forEach(i=>i.classList.remove('active-flow'));render()}
+$('trainTab').onclick=()=>{mode='train';$('trainTab').classList.add('active');$('performTab').classList.remove('active');$('stageTitle').textContent='Train Mode';$('startBtn').textContent='Start Train';remaining=Number($('trainMinutes').value)*60;$('timer').textContent=fmt(remaining);$('mainPrompt').textContent='Ready?';$('subPrompt').textContent='Press Start Train to begin the daily routine.';$('constraintBox').style.display='none';$('performAudioControls').style.display='none';document.querySelectorAll('#flowList .item').forEach(i=>i.classList.remove('active-flow'));render()}
+$('performTab').onclick=()=>{mode='perform';$('performTab').classList.add('active');$('trainTab').classList.remove('active');$('stageTitle').textContent='Perform Mode';$('startBtn').textContent='Start Perform';remaining=Number($('performMinutes').value)*60;$('timer').textContent=fmt(remaining);$('mainPrompt').textContent='Ready to jam?';$('subPrompt').textContent='Choose a key, tempo and volume. The app will assign a major or minor rock progression.';$('constraintBox').style.display='block';$('performAudioControls').style.display='grid';$('constraintBox').textContent='Constraint: no comfort-zone choosing';document.querySelectorAll('#flowList .item').forEach(i=>i.classList.remove('active-flow'));render()}
+$('backingToggle').onchange=e=>{
+  backingEnabled=e.target.checked;
+  if(!backingEnabled) stopBackingChord();
+  else if(mode==='perform'&&timerId) playBackingChord();
+};
+$('metroVolume').oninput=e=>{
+  metronomeVolume=Number(e.target.value)/100;
+  $('metroVolumeValue').textContent=e.target.value+'%';
+};
+$('backingVolume').oninput=e=>{
+  backingVolume=Number(e.target.value)/100;
+  $('backingVolumeValue').textContent=e.target.value+'%';
+  if(mode==='perform'&&timerId&&backingEnabled) playBackingChord();
+};
 $('startBtn').onclick=startSession;$('stopBtn').onclick=()=>{stopTimer();stopMetro()};$('metroBtn').onclick=()=>metroOn?stopMetro():startMetro();$('completeBtn').onclick=()=>{localStorage.setItem('cagedLastPosition',$('positionSelect').value);localStorage.setItem('cagedSessions',Number(localStorage.getItem('cagedSessions')??0)+1);localStorage.setItem('cagedLastSession',new Date().toLocaleDateString());$('positionSelect').value=(Number($('positionSelect').value)+1)%positions.length;render()}
 ;['keySelect','positionSelect','bpmInput','trainMinutes','performMinutes'].forEach(id=>$(id).addEventListener('change',render));render();remaining=Number($('trainMinutes').value)*60;$('timer').textContent=fmt(remaining);
 </script></body></html>

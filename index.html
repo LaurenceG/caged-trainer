@@ -278,6 +278,12 @@ function nextPrompt(){
   performPrompt(true);
 }
 
+function stopTimer(){
+  if(timerId) clearInterval(timerId);
+  timerId=null;
+  stopBackingChord();
+}
+
 function startSession(){
   stopTimer();
   if(!metroOn) startMetro();

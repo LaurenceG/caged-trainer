@@ -26,7 +26,16 @@ label{font-size:13px;font-weight:800;color:var(--navy)}select,input{border:1.5px
 .progression-arrow{color:#667085;font-weight:900;font-size:20px}
 .perform-mode-badge{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:#eef4ff;color:var(--navy);font-size:13px;font-weight:800;margin-bottom:8px}
 .volume-row{display:grid;grid-template-columns:130px 1fr 48px;align-items:center;gap:10px}
-.volume-row input[type="range"]{width:100%}.big{font-size:42px;font-weight:900;color:var(--navy);line-height:1}.medium{font-size:24px;font-weight:900}.constraint{border:1.5px solid var(--navy2);border-radius:12px;padding:16px;background:#f8fbff;color:var(--navy);font-size:24px;font-weight:900}
+.volume-row input[type="range"]{width:100%}
+.info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.info-grid.two-wide{grid-template-columns:1fr}
+.info-card{border:1px solid #d0d5dd;border-radius:14px;padding:14px;background:#fff;min-height:92px;display:flex;flex-direction:column;justify-content:center}
+.info-label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#98a2b3;font-weight:700;margin-bottom:6px}
+.info-value{font-size:28px;line-height:1.1;color:#101828;font-weight:850}
+.perform-constraint-label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#98a2b3;font-weight:700;margin-bottom:5px}
+.perform-constraint-value{font-size:23px;line-height:1.2;color:#101828;font-weight:850}
+.pause-state{opacity:.72}
+@media(max-width:520px){.info-grid{gap:9px}.info-card{padding:12px;min-height:82px}.info-value{font-size:23px}}.big{font-size:42px;font-weight:900;color:var(--navy);line-height:1}.medium{font-size:24px;font-weight:900}.constraint{border:1.5px solid var(--navy2);border-radius:12px;padding:16px;background:#f8fbff;color:var(--navy);font-size:24px;font-weight:900}
 .meta{display:flex;gap:10px;flex-wrap:wrap}.pill{border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:13px;font-weight:800;color:var(--navy);background:white}
 .actions{display:flex;gap:10px;flex-wrap:wrap;padding:0 26px 26px}button.primary,button.secondary,button.danger{border-radius:10px;padding:13px 18px;font-size:15px;font-weight:900;cursor:pointer}button.primary{border:0;background:var(--navy);color:white}button.secondary{background:#eef3fb;color:var(--navy);border:1px solid var(--line)}button.danger{background:#fff2f0;color:var(--danger);border:1px solid #fecdca}
 .side{display:grid;gap:18px}.side h3{margin:0 0 10px;color:var(--navy);font-size:18px}.list{display:grid;gap:8px}.item{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:white;display:flex;justify-content:space-between;gap:12px;font-size:14px}
@@ -58,7 +67,8 @@ label{font-size:13px;font-weight:800;color:var(--navy)}select,input{border:1.5px
   </div>
 </div><input id="trainMinutes" type="number" min="3" max="20" value="10"></div><div class="control"><label>Perform minutes</label><input id="performMinutes" type="number" min="1" max="15" value="5"></div></div>
 <div class="mode-tabs"><button id="trainTab" class="active">Train Mode</button><button id="performTab">Perform Mode</button></div>
-<div class="main-grid"><section class="card stage-card"><div class="stage-head"><h2 id="stageTitle">Train Mode</h2><div class="timer" id="timer">10:00</div></div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div class="prompt"><div class="meta"><span class="pill" id="keyPill">Key: A</span><span class="pill" id="positionPill">1st position</span><span class="pill"><span class="metronome-dot" id="metroDot"></span><span id="bpmPill">80 BPM</span></span></div><div class="prompt-card gray" id="promptCard"><div class="big" id="mainPrompt">Ready?</div><div class="medium" id="subPrompt">Press Start Train to begin the daily routine.</div><div class="constraint" id="constraintBox" style="display:none"></div></div></div><div class="actions"><button class="primary" id="startBtn">Start Train</button><button class="secondary" id="metroBtn">Start Metronome</button><button class="danger" id="stopBtn">Stop</button><button class="secondary" id="completeBtn">Mark Session Complete</button></div></section>
+<div class="main-grid"><section class="card stage-card"><div class="stage-head"><h2 id="stageTitle">Train Mode</h2><div class="timer" id="timer">10:00</div></div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div class="prompt"><div class="meta"><span class="pill" id="keyPill">Key: A</span><span class="pill" id="positionPill">1st position</span><span class="pill"><span class="metronome-dot" id="metroDot"></span><span id="bpmPill">80 BPM</span></span></div><div class="prompt-card gray" id="promptCard"><div class="big" id="mainPrompt">Ready?</div><div class="medium" id="subPrompt">Press Start Train to begin the daily routine.</div><div class="constraint" id="constraintBox" style="display:none"></div></div></div><div class="actions"><button class="primary" id="startBtn">Start Train</button>
+<button class="secondary" id="pauseBtn" type="button" disabled>Pause</button><button class="secondary" id="metroBtn">Start Metronome</button><button class="danger" id="stopBtn">Stop</button><button class="secondary" id="completeBtn">Mark Session Complete</button></div></section>
 <aside class="side"><section class="card panel"><h3>Session Flow</h3><div class="list" id="flowList"></div></section><section class="card panel"><h3>Today’s Rotation</h3><div class="list" id="rotationList"></div></section><section class="card panel"><h3>Progress</h3><div class="list" id="progressList"></div></section></aside></div>
 <div class="footer-note">Train mode now runs automatically: the metronome starts with the session, prompts advance on their own, and a bell marks each new section.</div>
 </section></main>
@@ -67,7 +77,19 @@ const keys=['A','Bb','B','C','C#','D','D#','E','F','F#','G','G#'], chromatic=key
 const positions=[{name:'1st position',major:'E shape',minor:'Dm shape'},{name:'2nd position',major:'D shape',minor:'Cm shape'},{name:'3rd position',major:'C shape',minor:'Am shape'},{name:'4th position',major:'A shape',minor:'Gm shape'},{name:'5th position',major:'G shape',minor:'Em shape'}];
 const degreeShapes={'1st position':[['1','E'],['2','Gm (A)'],['3','Am (C)'],['4','A'],['5','C'],['6','Dm (E)']],'2nd position':[['1','D'],['2','Em (G)'],['3','Gm (A)'],['4','G'],['5','A'],['6','Cm (D)']],'3rd position':[['1','C'],['2','Dm (E)'],['3','Em (G)'],['4','E'],['5','G'],['6','Am (C)']],'4th position':[['1','A'],['2','Cm (D)'],['3','Dm (E)'],['4','D'],['5','E'],['6','Gm (A)']],'5th position':[['1','G'],['2','Am (C)'],['3','Cm (D)'],['4','C'],['5','D'],['6','Em (G)']]};
 const trainBlocks=[['Note Recall',60],['Chord Shape',90],['Arpeggio',120],['Full Scale',180],['Pentatonic',90]];
-const constraints=['Chord tones only','Arpeggio only','Full scale only','Pentatonic only','Avoid the root','Start every phrase on the 3rd','Resolve every phrase to the 5th','Use only strings 1–3','Use only strings 4–6','Free solo'];
+const constraints=[
+'Full arpeggio',
+'Triad — root, 3rd / ♭3rd and 5th',
+'Target the root',
+'Target the 3rd / ♭3rd',
+'Target the 5th',
+'Hit all chord tones at least once',
+'Use the full major / minor scale',
+'Use only the major / minor pentatonic scale',
+'Bottom (high) 2 strings only',
+'Middle 2 strings only',
+'Top (low) 2 strings only'
+];
 const performProgressions=[
   {name:'Pop Rock',mode:'major',degrees:['1','5','6','4']},
   {name:'Classic Rock',mode:'major',degrees:['1','4','5']},
@@ -87,6 +109,7 @@ let backingVoices=[];
 let backingEnabled=true;
 let metronomeVolume=.75;
 let backingVolume=.35;
+let isPaused=false;
 let mode='train',timerId=null,metroId=null,remaining=600,total=600,promptIndex=0,metroOn=false,audioCtx=null;
 const $=id=>document.getElementById(id);
 keys.forEach(k=>$('keySelect').add(new Option(k,k)));positions.forEach((p,i)=>$('positionSelect').add(new Option(`${p.name} — ${p.major} / ${p.minor}`,i)));
@@ -139,34 +162,50 @@ function dingSound(){
   osc.stop(now+.42);
 }
 
-function trainPrompt(sectionIndex, itemIndex, soundPrompt=true){
+function ordinal(n){
+  const x=Number(n),m=x%100;
+  if(m>=11&&m<=13)return x+'th';
+  return x+(x%10===1?'st':x%10===2?'nd':x%10===3?'rd':'th');
+}
+function infoCards(items,wide=false){
+  return '<div class="info-grid '+(wide?'two-wide':'')+'">'+items.map(i=>'<div class="info-card"><div class="info-label">'+i[0]+'</div><div class="info-value">'+i[1]+'</div></div>').join('')+'</div>';
+}
+function normalizeShapeLabel(s){return String(s||'').replace(' shape','').trim()}
+function minorShapeForMajorShape(s){return ({C:'Am',A:'Gm',G:'Em',E:'Dm',D:'Cm'})[s]||s+'m'}
+function degreeNumber(v){const m=String(v).match(/\d+/);return m?Number(m[0]):1}
+function trainPrompt(sectionIndex,itemIndex,soundPrompt=true){
   animatePromptCard();
   if(soundPrompt) dingSound();
   const key=$('keySelect').value;
-  const block=trainBlocks[sectionIndex];
-  const section=block[0];
-  const allShapes=shapes();
-  const ds=allShapes[itemIndex%allShapes.length];
+  const section=trainBlocks[sectionIndex][0];
+  const ds=shapes()[itemIndex%shapes().length];
   const degree=ds[0];
-  const shape=ds[1];
+  const shape=normalizeShapeLabel(ds[1]);
   const ch=chord(key,degree);
+  const positionLabel=ordinal(posIndex+1);
+  const degreeLabel=ordinal(degreeNumber(degree));
+  const isMinor=String(ch).includes('m');
+  const majorShape=shape.replace('m','');
+  const minorShape=minorShapeForMajorShape(majorShape);
+  const shapePair=isMinor?minorShape+' ('+majorShape+')':majorShape+' ('+minorShape+')';
 
   $('constraintBox').style.display='none';
   $('mainPrompt').textContent=section;
 
   if(section==='Note Recall'){
     const note=rand(scale(key));
-    $('subPrompt').textContent='Find every '+note+' on the guitar neck. Say the note name out loud and stay in time.';
+    $('subPrompt').innerHTML=infoCards([['Note',note],['Instruction','Find every '+note+' on the neck']]);
   }else if(section==='Chord Shape'){
-    $('subPrompt').textContent='Play '+ch+' using the '+shape+' shape — degree '+degree+' in '+pos().name+'.';
+    $('subPrompt').innerHTML=infoCards([['Chord',ch],['CAGED Shape',shapePair],['Position',positionLabel],['Degree',degreeLabel]]);
   }else if(section==='Arpeggio'){
-    $('subPrompt').textContent='Play the '+ch+' arpeggio using the '+shape+' shape.';
+    $('subPrompt').innerHTML=infoCards([['Arpeggio',ch+' arpeggio'],['CAGED Shape',shapePair]],true);
   }else if(section==='Full Scale'){
-    $('subPrompt').textContent='Play the '+ch+' full '+([2,3,6].includes(Number(degree))?'minor':'major')+' scale using the '+shape+' shape.';
+    $('subPrompt').innerHTML=infoCards([['Scale',ch.replace('m','')+' '+(isMinor?'minor':'major')+' scale'],['CAGED Shape',isMinor?minorShape:majorShape],['Position',positionLabel],['Degree',degreeLabel]]);
   }else if(section==='Pentatonic'){
-    $('subPrompt').textContent='Play the '+ch+' '+([2,3,6].includes(Number(degree))?'minor':'major')+' pentatonic using the '+shape+' shape.';
+    $('subPrompt').innerHTML=infoCards([['Scale',ch.replace('m','')+' '+(isMinor?'minor':'major')+' pentatonic scale'],['CAGED Shape',isMinor?minorShape:majorShape],['Position',positionLabel],['Degree',degreeLabel]]);
   }
 }
+
 const NOTE_INDEX={'C':0,'C#':1,'D':2,'D#':3,'E':4,'F':5,'F#':6,'G':7,'G#':8,'A':9,'A#':10,'B':11,'Bb':10};
 
 function midiToFreq(midi){
@@ -269,7 +308,7 @@ function performPrompt(soundPrompt=true){
   const degree=activePerformProgression.degrees[activePerformChordIndex];
   $('mainPrompt').textContent=chordNameForMode(key,activePerformProgression.mode,degree);
   renderPerformProgression();
-  $('constraintBox').textContent='Constraint: '+activePerformConstraint;
+  $('constraintBox').innerHTML='<div class="perform-constraint-label">Constraint</div><div class="perform-constraint-value">'+activePerformConstraint+'</div>';
   playBackingChord();
 }
 
@@ -284,88 +323,86 @@ function stopTimer(){
   timerId=null;
   stopBackingChord();
 }
+function setPausedUI(paused){
+  isPaused=paused;
+  $('pauseBtn').textContent=paused?'Resume':'Pause';
+  $('promptCard').classList.toggle('pause-state',paused);
+}
+function pauseSession(){
+  if(!timerId||isPaused)return;
+  clearInterval(timerId);timerId=null;
+  stopMetro();stopBackingChord();setPausedUI(true);
+}
+function resumeSession(){
+  if(!isPaused)return;
+  setPausedUI(false);
+  startMetro();
+  if(mode==='perform'){playBackingChord();startPerformTimer()}
+  else startTrainTimer();
+}
+function togglePause(){isPaused?resumeSession():pauseSession()}
 
-function startSession(){
-  stopTimer();
-  if(!metroOn) startMetro();
-  promptIndex=0;
+let trainState=null;
 
-  if(mode==='perform'){
-    total=Number($('performMinutes').value)*60;
-    remaining=total;
-    $('timer').textContent=fmt(remaining);
-    $('progressFill').style.width='0%';
-    activePerformProgression=rand(performProgressions);
-    activePerformChordIndex=0;
-    performChordBeatCount=0;
-    activePerformConstraint=rand(constraints);
-    performPrompt(false);
-    timerId=setInterval(()=>{
-      remaining--;
-      if(remaining<0){
-        stopTimer();
-        stopMetro();
-        $('mainPrompt').textContent='Session complete';
-        $('subPrompt').textContent='Mark complete if you finished.';
-        $('constraintBox').textContent='Nice work.';
-        return;
-      }
-      $('timer').textContent=fmt(remaining);
-      $('progressFill').style.width=(100-(remaining/total)*100)+'%';
-    },1000);
-    return;
-  }
-
-  const baseTotal=trainBlocks.reduce((sum,b)=>sum+b[1],0);
-  total=Number($('trainMinutes').value)*60;
-  remaining=total;
-  $('timer').textContent=fmt(remaining);
-  $('progressFill').style.width='0%';
-
-  const scaledSections=trainBlocks.map(b=>[b[0],Math.round((b[1]/baseTotal)*total)]);
-  let sectionIndex=0;
-  let sectionElapsed=0;
-  let itemIndex=0;
-  let currentSectionLength=scaledSections[0][1];
-
-  render();
-  highlightFlow(sectionIndex);
-  trainPrompt(sectionIndex,itemIndex,false);
-
+function finishSession(){
+  stopTimer();stopMetro();setPausedUI(false);$('pauseBtn').disabled=true;
+  $('mainPrompt').textContent='Session complete';
+  $('subPrompt').textContent='Mark complete if you finished.';
+  if(mode==='perform')$('constraintBox').textContent='Nice work.';
+}
+function startPerformTimer(){
   timerId=setInterval(()=>{
     remaining--;
-    sectionElapsed++;
-
-    if(remaining<0){
-      stopTimer();
-      stopMetro();
-      $('mainPrompt').textContent='Session complete';
-      $('subPrompt').textContent='Mark complete if you finished.';
-      return;
-    }
-
+    if(remaining<0){finishSession();return}
     $('timer').textContent=fmt(remaining);
     $('progressFill').style.width=(100-(remaining/total)*100)+'%';
-
-    const promptInterval = scaledSections[sectionIndex][0]==='Note Recall'
-      ? Math.max(15,Math.floor(currentSectionLength/4))
-      : Math.max(12,Math.floor(currentSectionLength/6));
-
-    if(sectionElapsed>0 && sectionElapsed%promptInterval===0){
-      itemIndex++;
-      trainPrompt(sectionIndex,itemIndex);
+  },1000);
+  $('pauseBtn').disabled=false;
+}
+function startTrainTimer(){
+  timerId=setInterval(()=>{
+    remaining--;trainState.sectionElapsed++;
+    if(remaining<0){finishSession();return}
+    $('timer').textContent=fmt(remaining);
+    $('progressFill').style.width=(100-(remaining/total)*100)+'%';
+    const name=trainState.scaledSections[trainState.sectionIndex][0];
+    const interval=name==='Note Recall'?Math.max(15,Math.floor(trainState.currentSectionLength/4)):Math.max(12,Math.floor(trainState.currentSectionLength/6));
+    if(trainState.sectionElapsed>0&&trainState.sectionElapsed%interval===0){
+      trainState.itemIndex++;
+      trainPrompt(trainState.sectionIndex,trainState.itemIndex);
     }
-
-    if(sectionElapsed>=currentSectionLength && sectionIndex<scaledSections.length-1){
+    if(trainState.sectionElapsed>=trainState.currentSectionLength&&trainState.sectionIndex<trainState.scaledSections.length-1){
       bellSound();
-      sectionIndex++;
-      sectionElapsed=0;
-      itemIndex=0;
-      currentSectionLength=scaledSections[sectionIndex][1];
-      highlightFlow(sectionIndex);
-      trainPrompt(sectionIndex,itemIndex);
+      trainState.sectionIndex++;
+      trainState.sectionElapsed=0;
+      trainState.itemIndex=0;
+      trainState.currentSectionLength=trainState.scaledSections[trainState.sectionIndex][1];
+      highlightFlow(trainState.sectionIndex);
+      trainPrompt(trainState.sectionIndex,trainState.itemIndex);
     }
   },1000);
+  $('pauseBtn').disabled=false;
+}
+function startSession(){
+  stopTimer();setPausedUI(false);
+  if(!metroOn)startMetro();
+  promptIndex=0;
+  if(mode==='perform'){
+    total=Number($('performMinutes').value)*60;remaining=total;
+    $('timer').textContent=fmt(remaining);$('progressFill').style.width='0%';
+    activePerformProgression=rand(performProgressions);
+    activePerformChordIndex=0;performChordBeatCount=0;
+    activePerformConstraint=rand(constraints);
+    performPrompt(false);
+    startPerformTimer();
+    return;
+  }
+  const baseTotal=trainBlocks.reduce((sum,b)=>sum+b[1],0);
+  total=Number($('trainMinutes').value)*60;remaining=total;
+  $('timer').textContent=fmt(remaining);$('progressFill').style.width='0%';
+  const scaledSections=trainBlocks.map(b=>[b[0],Math.round((b[1]/baseTotal)*total)]);
+  trainState={scaledSections,sectionIndex:0,sectionElapsed:0,itemIndex:0,currentSectionLength:scaledSections[0][1]};
+  render();highlightFlow(0);trainPrompt(0,0,false);startTrainTimer();
 }
 function clickSound(accent=false){
   if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
@@ -448,8 +485,8 @@ function startMetro(){
   tick();
   metroId=setInterval(tick,60000/Number($('bpmInput').value));
 }
-$('trainTab').onclick=()=>{mode='train';$('trainTab').classList.add('active');$('performTab').classList.remove('active');$('stageTitle').textContent='Train Mode';$('startBtn').textContent='Start Train';remaining=Number($('trainMinutes').value)*60;$('timer').textContent=fmt(remaining);$('mainPrompt').textContent='Ready?';$('subPrompt').textContent='Press Start Train to begin the daily routine.';$('constraintBox').style.display='none';$('performAudioControls').style.display='none';document.querySelectorAll('#flowList .item').forEach(i=>i.classList.remove('active-flow'));render()}
-$('performTab').onclick=()=>{mode='perform';$('performTab').classList.add('active');$('trainTab').classList.remove('active');$('stageTitle').textContent='Perform Mode';$('startBtn').textContent='Start Perform';remaining=Number($('performMinutes').value)*60;$('timer').textContent=fmt(remaining);$('mainPrompt').textContent='Ready to jam?';$('subPrompt').textContent='Choose a key, tempo and volume. The app will assign a major or minor rock progression.';$('constraintBox').style.display='block';$('performAudioControls').style.display='grid';$('constraintBox').textContent='Constraint: no comfort-zone choosing';document.querySelectorAll('#flowList .item').forEach(i=>i.classList.remove('active-flow'));render()}
+$('trainTab').onclick=()=>{stopTimer();stopMetro();setPausedUI(false);$('pauseBtn').disabled=true;mode='train';$('trainTab').classList.add('active');$('performTab').classList.remove('active');$('stageTitle').textContent='Train Mode';$('startBtn').textContent='Start Train';remaining=Number($('trainMinutes').value)*60;$('timer').textContent=fmt(remaining);$('mainPrompt').textContent='Ready?';$('subPrompt').textContent='Press Start Train to begin the daily routine.';$('constraintBox').style.display='none';$('performAudioControls').style.display='none';document.querySelectorAll('#flowList .item').forEach(i=>i.classList.remove('active-flow'));render()}
+$('performTab').onclick=()=>{stopTimer();stopMetro();setPausedUI(false);$('pauseBtn').disabled=true;mode='perform';$('performTab').classList.add('active');$('trainTab').classList.remove('active');$('stageTitle').textContent='Perform Mode';$('startBtn').textContent='Start Perform';remaining=Number($('performMinutes').value)*60;$('timer').textContent=fmt(remaining);$('mainPrompt').textContent='Ready to jam?';$('subPrompt').textContent='Choose a key, tempo and volume. The app will assign a major or minor rock progression.';$('constraintBox').style.display='block';$('performAudioControls').style.display='grid';$('constraintBox').textContent='Constraint: no comfort-zone choosing';document.querySelectorAll('#flowList .item').forEach(i=>i.classList.remove('active-flow'));render()}
 $('backingToggle').onchange=e=>{
   backingEnabled=e.target.checked;
   if(!backingEnabled) stopBackingChord();
@@ -464,6 +501,7 @@ $('backingVolume').oninput=e=>{
   $('backingVolumeValue').textContent=e.target.value+'%';
   if(mode==='perform'&&timerId&&backingEnabled) playBackingChord();
 };
-$('startBtn').onclick=startSession;$('stopBtn').onclick=()=>{stopTimer();stopMetro()};$('metroBtn').onclick=()=>metroOn?stopMetro():startMetro();$('completeBtn').onclick=()=>{localStorage.setItem('cagedLastPosition',$('positionSelect').value);localStorage.setItem('cagedSessions',Number(localStorage.getItem('cagedSessions')??0)+1);localStorage.setItem('cagedLastSession',new Date().toLocaleDateString());$('positionSelect').value=(Number($('positionSelect').value)+1)%positions.length;render()}
+$('startBtn').onclick=startSession;
+$('pauseBtn').onclick=togglePause;$('stopBtn').onclick=()=>{stopTimer();stopMetro()};$('metroBtn').onclick=()=>metroOn?stopMetro():startMetro();$('completeBtn').onclick=()=>{localStorage.setItem('cagedLastPosition',$('positionSelect').value);localStorage.setItem('cagedSessions',Number(localStorage.getItem('cagedSessions')??0)+1);localStorage.setItem('cagedLastSession',new Date().toLocaleDateString());$('positionSelect').value=(Number($('positionSelect').value)+1)%positions.length;render()}
 ;['keySelect','positionSelect','bpmInput','trainMinutes','performMinutes'].forEach(id=>$(id).addEventListener('change',render));render();remaining=Number($('trainMinutes').value)*60;$('timer').textContent=fmt(remaining);
 </script></body></html>

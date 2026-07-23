@@ -115,7 +115,7 @@ const $=id=>document.getElementById(id);
 keys.forEach(k=>$('keySelect').add(new Option(k,k)));positions.forEach((p,i)=>$('positionSelect').add(new Option(`${p.name} — ${p.major} / ${p.minor}`,i)));
 $('positionSelect').value=(Number(localStorage.getItem('cagedLastPosition')??-1)+1)%positions.length;
 function scale(key){const start=chromatic.indexOf(key);return majorSteps.map(s=>chromatic[(start+s)%chromatic.length])}
-function chord(key,d){const sc=scale(key);d=Number(d);if(d===7)return sc[6]+'dim';if([2,3,6].includes(d))return sc[d-1]+'min';return sc[d-1]}
+function chord(key,d){const sc=scale(key);d=Number(d);if(d===7)return sc[6]+'dim';if([2,3,6].includes(d))return sc[d-1]+'m';return sc[d-1]}
 function fmt(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
 function pos(){return positions[Number($('positionSelect').value)]}function shapes(){return degreeShapes[pos().name]}function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function render(){ $('keyPill').textContent='Key: '+$('keySelect').value;$('positionPill').textContent=pos().name;$('bpmPill').textContent=$('bpmInput').value+' BPM';
@@ -172,6 +172,9 @@ function infoCards(items,wide=false){
   return '<div class="info-grid '+(wide?'two-wide':'')+'">'+items.map(i=>'<div class="info-card"><div class="info-label">'+i[0]+'</div><div class="info-value">'+i[1]+'</div></div>').join('')+'</div>';
 }
 function normalizeShapeLabel(s){return String(s||'').replace(' shape','').trim()}
+function sourceShapeDisplay(s){
+  return normalizeShapeLabel(s).split(/\s|\(/)[0].trim();
+}
 function minorShapeForMajorShape(s){return ({C:'Am',A:'Gm',G:'Em',E:'Dm',D:'Cm'})[s]||s+'m'}
 function degreeNumber(v){const m=String(v).match(/\d+/);return m?Number(m[0]):1}
 function trainPrompt(sectionIndex,itemIndex,soundPrompt=true){
@@ -182,10 +185,11 @@ function trainPrompt(sectionIndex,itemIndex,soundPrompt=true){
   const ds=shapes()[itemIndex%shapes().length];
   const degree=ds[0];
   const shape=normalizeShapeLabel(ds[1]);
+  const sourceShape=sourceShapeDisplay(ds[1]);
   const ch=chord(key,degree);
   const positionLabel=ordinal(Number($('positionSelect').value)+1);
   const degreeLabel=ordinal(degreeNumber(degree));
-  const isMinor=String(ch).includes('m');
+  const isMinor=/m$/.test(String(ch));
   const majorShape=shape.replace('m','');
   const minorShape=minorShapeForMajorShape(majorShape);
   const shapePair=isMinor?minorShape+' ('+majorShape+')':majorShape+' ('+minorShape+')';
@@ -197,13 +201,13 @@ function trainPrompt(sectionIndex,itemIndex,soundPrompt=true){
     const note=rand(scale(key));
     $('subPrompt').innerHTML=infoCards([['Note',note],['Instruction','Find every '+note+' on the neck']]);
   }else if(section==='Chord Shape'){
-    $('subPrompt').innerHTML=infoCards([['Chord',ch],['CAGED Shape',shapePair],['Position',positionLabel],['Degree',degreeLabel]]);
+    $('subPrompt').innerHTML=infoCards([['Chord',ch],['CAGED Shape',sourceShape],['Position',positionLabel],['Degree',degreeLabel]]);
   }else if(section==='Arpeggio'){
-    $('subPrompt').innerHTML=infoCards([['Arpeggio',ch+' arpeggio'],['CAGED Shape',shapePair]],true);
+    $('subPrompt').innerHTML=infoCards([['Arpeggio',ch+' arpeggio'],['CAGED Shape',sourceShape]],true);
   }else if(section==='Full Scale'){
-    $('subPrompt').innerHTML=infoCards([['Scale',ch.replace('m','')+' '+(isMinor?'minor':'major')+' scale'],['CAGED Shape',isMinor?minorShape:majorShape],['Position',positionLabel],['Degree',degreeLabel]]);
+    $('subPrompt').innerHTML=infoCards([['Scale',ch.replace('m','')+' '+(isMinor?'minor':'major')+' scale'],['CAGED Shape',sourceShape],['Position',positionLabel],['Degree',degreeLabel]]);
   }else if(section==='Pentatonic'){
-    $('subPrompt').innerHTML=infoCards([['Scale',ch.replace('m','')+' '+(isMinor?'minor':'major')+' pentatonic scale'],['CAGED Shape',isMinor?minorShape:majorShape],['Position',positionLabel],['Degree',degreeLabel]]);
+    $('subPrompt').innerHTML=infoCards([['Scale',ch.replace('m','')+' '+(isMinor?'minor':'major')+' pentatonic scale'],['CAGED Shape',sourceShape],['Position',positionLabel],['Degree',degreeLabel]]);
   }
 }
 
